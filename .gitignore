@@ -1,0 +1,43 @@
+# ==============================================================================
+# .gitignore — RevGlamp Coursework Documentation Repository
+# ==============================================================================
+
+# Temporary files created by MS Office / Word / Excel / PowerPoint
+~$*.docx
+~$*.xlsx
+~$*.pptx
+*.tmp
+
+# Operating System files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.Spotlight-V100
+.Trashes
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Local AI assistant tools, plugin caches, and lock files
+.agent/
+skills-lock.json
+.antigravity/
+.gemini/
+
+# Local scripts & scratch folders
+scripts/
+scratch/
+tmp/
+*.bak
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
