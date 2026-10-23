@@ -27,9 +27,9 @@ C4Component
 
     Container(spa, "Веб-календарь тарифов", "React 18 SPA", "Пользовательский интерфейс управляющего")
     ContainerDb(db, "База данных тарифов", "SQLite / PostgreSQL", "Хранилище ставок, броней, истории")
-    System_Ext(weather, "Open-Meteo API", "Внешний прогноз погоды")
-    System_Ext(pms, "Система управления отелем (PMS)", "Bnovo / TravelLine / iCal")
-    System_Ext(llm, "LLM Провайдер", "Внешняя нейросетевая модель рекомендаций")
+    System_Ext(weather, "Open-Meteo API", "Внешний прогноз погоды на 14 дней")
+    System_Ext(cal_rf, "Производственный календарь РФ", "Календарь праздников и нерабочих дней")
+    System_Ext(pms, "Система отеля (PMS)", "Bnovo / TravelLine / iCal")
 
     Container_Boundary(backend, "Серверное приложение (Backend API & Pricing Core)") {
         Component(ctrl, "Pricing API Controller", "FastAPI Router, Pydantic", "Маршрутизация HTTP-запросов, валидация входных DTO, сериализация ответов")
@@ -39,26 +39,20 @@ C4Component
         Component(cal_srv, "Calendar & Seasonality Service", "Python 3.11 Service", "Справочник производственного календаря РФ, расчет сезонности (K_season)")
         Component(pms_sync, "PMS Synchronization & Export", "Python icalendar, CSV Engine", "Экспорт утвержденных тарифов в iCal (RFC 5545) и прием данных броней")
         Component(repo, "Database Repository", "SQLAlchemy 2.0 ORM / Core", "Единая точка доступа к данным: транзакции, CRUD операций, целостность")
-        Component(advisor, "AI Advisory Copilot", "Python LLM Agent", "Генерация текстовых рекомендаций по маркетингу и спецпредложениям")
     }
 
-    Rel(spa, ctrl, "REST API запросы (расчет, оверрайд, экспорт)", "HTTPS / JSON")
-    
-    Rel(ctrl, engine, "Вызов расчета тарифов", "In-process call")
-    Rel(ctrl, repo, "Получение списков и настроек", "In-process call")
-    Rel(ctrl, pms_sync, "Запрос генерации фида iCal", "In-process call")
-    Rel(ctrl, advisor, "Запрос пояснений к тарифу", "In-process call")
-
+    Rel(spa, ctrl, "REST API запросы тарифов и оверрайдов", "JSON / HTTPS")
+    Rel(ctrl, engine, "Инициирует расчет сетки на 60 дней", "In-process call")
     Rel(engine, occ, "Запрос коэффициента загрузки K_occ", "In-process call")
-    Rel(engine, weather_cli, "Запрос коэффициента погоды K_weather", "In-process call")
-    Rel(engine, cal_srv, "Запрос сезонного коэффициента K_season", "In-process call")
-    Rel(engine, repo, "Запрос базовых цен и floor price", "In-process call")
-
-    Rel(occ, repo, "Чтение матрицы занятости жилья", "In-process call")
-    Rel(weather_cli, weather, "Запрос метеопрогноза (температура, дождь)", "HTTPS / REST JSON")
-    Rel(pms_sync, pms, "Выгрузка тарифов по ссылке iCal / Webhook", "HTTPS / iCal RFC 5545")
-    Rel(advisor, llm, "Промпт с параметрами загрузки и тарифов", "HTTPS / REST")
-    Rel(repo, db, "SQL-запросы (SELECT, INSERT, UPDATE)", "SQL / SQLAlchemy Session")
+    Rel(engine, weather_cli, "Запрос погодного коэффициента K_weather", "In-process call")
+    Rel(weather_cli, weather, "Запрос метеопрогноза (осадки, t°)", "HTTPS / REST")
+    Rel(engine, cal_srv, "Запрос сезонного множителя K_season", "In-process call")
+    Rel(cal_srv, cal_rf, "Запрос календаря праздников РФ", "HTTPS / JSON")
+    Rel(pms, pms_sync, "Считывание тарифов по ссылке iCal URL", "RFC 5545 iCal / GET")
+    Rel(occ, repo, "Чтение фактических бронирований", "In-process call")
+    Rel(engine, repo, "Чтение Floor Price, сохранение тарифов", "In-process call")
+    Rel(pms_sync, repo, "Чтение утвержденных тарифов", "In-process call")
+    Rel(repo, db, "Параметризованные SQL-запросы (CRUD)", "SQL / SQLAlchemy Session")
 ```
 
 ---
