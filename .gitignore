@@ -34,8 +34,14 @@ skills-lock.json
 # Local scripts & scratch folders
 scripts/
 scratch/
+scratch_*
 tmp/
 *.bak
+
+# Electron / IDE dumps
+ipcHandlers.js
+languageServer.js
+preload.js
 
 # Python bytecode
 __pycache__/
